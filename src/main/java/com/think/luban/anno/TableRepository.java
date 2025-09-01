@@ -26,4 +26,7 @@ public @interface TableRepository {
     @AliasFor(annotation = Component.class)
     String value() default "";
 
+    String id() default "";
+
+    String file() default "";
 }

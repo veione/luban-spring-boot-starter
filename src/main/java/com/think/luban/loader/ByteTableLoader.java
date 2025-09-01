@@ -1,7 +1,15 @@
 package com.think.luban.loader;
 
-import com.think.luban.ByteBuf;
-import com.think.luban.LubanTableProperties;
+import com.think.luban.LuBanTableProperties;
+import lombok.extern.slf4j.Slf4j;
+import luban.ByteBuf;
+import org.apache.commons.io.IOUtils;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * 二进制流表加载器
@@ -9,26 +17,25 @@ import com.think.luban.LubanTableProperties;
  * @author veione
  * @version 1.0
  */
-public class ByteTableLoader implements ITableLoader<ByteBuf> {
-    private String path;
+@Slf4j
+@Component
+public class ByteTableLoader extends AbstractTableLoader {
 
     @Override
-    public ByteBuf load(String file) {
-        return null;
+    public ByteBuf load(String file) throws IOException {
+        String fileName = String.format("%s%s%s.bytes", path, File.separator, file);
+        ClassPathResource resource = new ClassPathResource(fileName);
+        if (resource.exists()) {
+            try (InputStream inputStream = resource.getInputStream()) {
+                byte[] data = IOUtils.toByteArray(inputStream);
+                return new ByteBuf(data);
+            }
+        }
+        throw new IOException("Table file " + file + " not found");
     }
 
     @Override
-    public String getPath() {
-        return path;
-    }
-
-    @Override
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    @Override
-    public LubanTableProperties.TableType getLoaderType() {
-        return LubanTableProperties.TableType.BYTE;
+    public LuBanTableProperties.TableType getLoaderType() {
+        return LuBanTableProperties.TableType.BYTE;
     }
 }

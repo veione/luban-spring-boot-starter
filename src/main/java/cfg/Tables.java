@@ -9,9 +9,9 @@
 
 package cfg;
 
-import com.google.gson.JsonElement;
-import com.think.luban.anno.CfgTable;
+import com.think.luban.TableDefinition;
 import com.think.luban.loader.ITableLoader;
+import com.think.luban.repository.CfgRepository;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -21,21 +21,21 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 public final class Tables {
-    private final Map<Class<?>, CfgRepository<?, ?>> tableMap = new HashMap<>(64);
+	private final Map<Class<?>, CfgRepository<?, ?>> tableMap = new HashMap<>(64);
     private final Map<String, Class<?>> tableNameMap = new HashMap<>(64);
-    private final ITableLoader<JsonElement> loader;
+    private final ITableLoader loader;
 
-    public Tables(ITableLoader<JsonElement> loader) {
+    public Tables(ITableLoader loader) {
         this.loader = loader;
     }
 
-    public <T> void register(Class<T> clazz, CfgRepository<T, Serializable> repository) {
+    public <T> void register(TableDefinition definition, CfgRepository<T, Serializable> repository) {
+        Class<?> clazz = definition.getClazz();
         this.tableMap.put(clazz, repository);
-        CfgTable anno = clazz.getAnnotation(CfgTable.class);
-        this.tableNameMap.put(anno.value(), clazz);
+        this.tableNameMap.put(definition.getTableFileName(), clazz);
     }
 
-    public ITableLoader<JsonElement> getLoader() {
+    public ITableLoader getLoader() {
         return loader;
     }
 

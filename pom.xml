@@ -8,9 +8,9 @@
         <version>3.5.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.think.luban</groupId>
+    <groupId>com.think</groupId>
     <artifactId>luban-spring-boot-starter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>luban-spring-boot-starter</name>
     <description>luban-spring-boot-starter</description>
 

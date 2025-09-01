@@ -1,0 +1,110 @@
+{{~if __namespace != ''~}}
+package {{__namespace}};
+{{~end~}}
+
+import com.think.luban.TableDefinition;
+import com.think.luban.loader.ITableLoader;
+import com.think.luban.repository.CfgRepository;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
+{{~
+func get_table_inner_name
+    ret '_' + ($0 | string.downcase)
+end
+~}}
+
+public final class {{__name}} {
+	private final Map<Class<?>, CfgRepository<?, ?>> tableMap = new HashMap<>(64);
+    private final Map<String, Class<?>> tableNameMap = new HashMap<>(64);
+    private final ITableLoader loader;
+
+    public Tables(ITableLoader loader) {
+        this.loader = loader;
+    }
+
+    public <T> void register(TableDefinition definition, CfgRepository<T, Serializable> repository) {
+        Class<?> clazz = definition.getClazz();
+        this.tableMap.put(clazz, repository);
+        this.tableNameMap.put(definition.getTableFileName(), clazz);
+    }
+
+    public ITableLoader getLoader() {
+        return loader;
+    }
+
+    public Class<?> getTableClass(String name) {
+        return tableNameMap.get(name);
+    }
+
+    public <T, ID extends Serializable, R extends CfgRepository<T, ID>> R getRepository(Class<T> clazz) {
+        return (R) tableMap.get(clazz);
+    }
+
+    public <T> Optional<T> findById(Class<T> clazz, Predicate<T> predicate) {
+        CfgRepository<T, ?> repository = (CfgRepository<T, ?>) tableMap.get(clazz);
+        if (repository == null) {
+            return Optional.empty();
+        }
+
+        return repository.findById(predicate);
+    }
+
+    public <T> T findById(Class<T> clazz, Serializable id) {
+        CfgRepository<T, Serializable> repository = (CfgRepository<T, Serializable>) tableMap.get(clazz);
+        if (repository == null) {
+            return null;
+        }
+
+        return repository.findById(id);
+    }
+
+    public <T> List<T> findAll(Class<T> clazz, Predicate<T> predicate) {
+        CfgRepository<T, Serializable> repository = (CfgRepository<T, Serializable>) tableMap.get(clazz);
+        if (repository == null) {
+            return null;
+        }
+
+        return repository.findAll(predicate);
+    }
+
+    public <T> List<T> findAll(Class<T> clazz) {
+        CfgRepository<T, Serializable> repository = (CfgRepository<T, Serializable>) tableMap.get(clazz);
+        if (repository == null) {
+            return null;
+        }
+
+        return repository.findAll();
+    }
+
+    public <T> long count(Class<T> clazz, Predicate<T> predicate) {
+        CfgRepository<T, Serializable> repository = (CfgRepository<T, Serializable>) tableMap.get(clazz);
+        if (repository == null) {
+            return 0L;
+        }
+
+        return repository.count(predicate);
+    }
+
+    public <T> boolean exists(Class<T> clazz, Serializable id) {
+        CfgRepository<T, Serializable> repository = (CfgRepository<T, Serializable>) tableMap.get(clazz);
+        if (repository == null) {
+            return false;
+        }
+
+        return repository.exists(id);
+    }
+
+    public <T> boolean exists(Class<T> clazz, Predicate<T> predicate) {
+        CfgRepository<T, Serializable> repository = (CfgRepository<T, Serializable>) tableMap.get(clazz);
+        if (repository == null) {
+            return false;
+        }
+
+        return repository.exists(predicate);
+    }
+}

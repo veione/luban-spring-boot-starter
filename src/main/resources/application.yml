@@ -1,3 +1,6 @@
 luban:
-  path: classpath:/excel
+  path: excel\json
   type: json
+  interval: 5
+  scan-packages:
+    - cfg

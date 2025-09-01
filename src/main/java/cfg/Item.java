@@ -9,12 +9,26 @@
 
 package cfg;
 
+import luban.*;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import luban.AbstractBean;
 
 
 public final class Item extends AbstractBean {
-    public static final int __ID__ = 2289459;
+	
+	public Item(JsonObject _buf) { 
+        id = _buf.get("id").getAsInt();
+        type = _buf.get("type").getAsInt();
+        name = _buf.get("name").getAsString();
+        res = _buf.get("res").getAsString();
+        max = _buf.get("max").getAsInt();
+        desc = _buf.get("desc").getAsString();
+    }
+
+    public static Item deserialize(JsonObject _buf) {
+            return new Item(_buf);
+    }
+
     /**
      * 这是id
      */
@@ -27,6 +41,7 @@ public final class Item extends AbstractBean {
      * 名字
      */
     public final String name;
+    public final String res;
     /**
      * 上限
      */
@@ -35,32 +50,22 @@ public final class Item extends AbstractBean {
      * 描述
      */
     public final String desc;
-    public Item(JsonObject _buf) {
-        id = _buf.get("id").getAsInt();
-        type = _buf.get("type").getAsInt();
-        name = _buf.get("name").getAsString();
-        max = _buf.get("max").getAsInt();
-        desc = _buf.get("desc").getAsString();
-    }
 
-    public static Item deserialize(JsonObject _buf) {
-        return new Item(_buf);
-    }
-
+    public static final int __ID__ = 2289459;
+    
     @Override
-    public int getTypeId() {
-        return __ID__;
-    }
+    public int getTypeId() { return __ID__; }
 
     @Override
     public String toString() {
         return "{ "
-                + "(format_field_name __code_style field.name):" + id + ","
-                + "(format_field_name __code_style field.name):" + type + ","
-                + "(format_field_name __code_style field.name):" + name + ","
-                + "(format_field_name __code_style field.name):" + max + ","
-                + "(format_field_name __code_style field.name):" + desc + ","
-                + "}";
+        + "id:" + id + ","
+        + "type:" + type + ","
+        + "name:" + name + ","
+        + "res:" + res + ","
+        + "max:" + max + ","
+        + "desc:" + desc + ","
+        + "}";
     }
 }
 

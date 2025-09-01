@@ -1,6 +1,6 @@
 package com.think.luban;
 
-import com.think.luban.anno.CfgTable;
+import com.think.luban.anno.TableRepository;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.io.Serializable;
@@ -18,20 +18,20 @@ public final class TableDefinition {
     private final String tableFileName;
     private final List<Field> indexesFields = new ArrayList<>(4);
     private Field idField;
+    private final Class<?> repositoryClass;
 
-    public TableDefinition(Class<?> clazz) {
+    public TableDefinition(Class<?> clazz, Class<?> repositoryClass) {
         this.clazz = clazz;
-        CfgTable anno = clazz.getAnnotation(CfgTable.class);
-        this.tableFileName = anno.value();
+        this.repositoryClass = repositoryClass;
+        TableRepository anno = repositoryClass.getAnnotation(TableRepository.class);
+        this.tableFileName = anno.file();
         this.parseIndexes(anno);
     }
 
     /**
      * 解析索引
-     *
-     * @param anno
      */
-    private void parseIndexes(CfgTable anno) {
+    private void parseIndexes(TableRepository anno) {
         String idName = anno.id();
         if (idName != null && !idName.isEmpty()) {
             idField = FieldUtils.getField(clazz, idName, true);
@@ -40,12 +40,12 @@ public final class TableDefinition {
         }
         idField.setAccessible(true);
 
-        Field[] fields = FieldUtils.getAllFields(clazz);
+        /*Field[] fields = FieldUtils.getAllFields(clazz);
         for (Field field : fields) {
             if (field.isAnnotationPresent(Indexes.class)) {
                 indexesFields.add(field);
             }
-        }
+        }*/
     }
 
     public String getTableFileName() {
@@ -66,5 +66,9 @@ public final class TableDefinition {
      */
     public <T> Serializable getIdValue(T item) throws IllegalAccessException {
         return idField.getInt(item);
+    }
+
+    public Class<?> getClazz() {
+        return clazz;
     }
 }

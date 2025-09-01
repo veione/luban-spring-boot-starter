@@ -1,5 +1,7 @@
 package com.think.luban;
 
+import com.think.luban.repository.ByteTableRepositoryInvocationHandler;
+import com.think.luban.repository.JsonTableRepositoryInvocationHandler;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
@@ -24,10 +26,17 @@ public class TableRepositoryFactoryBean<T> implements FactoryBean<T>, Applicatio
     @Override
     public T getObject() throws Exception {
         // 因为DefaultCfgRepositoryInvocationHandler需要Class<T>作为参数,所以该类包含一个Class<T>的成员,通过构造函数初始化
-        return (T) Proxy.newProxyInstance(
-                interfaceType.getClassLoader(),
-                new Class[]{interfaceType},
-                new DefaultTableRepositoryInvocationHandler<>(applicationContext, interfaceType));
+        LuBanTableProperties props = applicationContext.getBean(LuBanTableProperties.class);
+        return switch (props.getType()) {
+            case JSON -> (T) Proxy.newProxyInstance(
+                    interfaceType.getClassLoader(),
+                    new Class[]{interfaceType},
+                    new JsonTableRepositoryInvocationHandler<>(applicationContext, interfaceType));
+            case BYTE -> (T) Proxy.newProxyInstance(
+                    interfaceType.getClassLoader(),
+                    new Class[]{interfaceType},
+                    new ByteTableRepositoryInvocationHandler<>(applicationContext, interfaceType));
+        };
     }
 
     @Override

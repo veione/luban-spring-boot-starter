@@ -1,9 +1,9 @@
 package com.think.luban.autoconfigure;
 
-import com.think.luban.LuBanTableLoaderFactory;
-import com.think.luban.LubanTableProperties;
-import com.think.luban.TableScanImportBeanDefinitionRegister;
-import com.think.luban.Tables;
+import cfg.Tables;
+import com.think.luban.loader.LuBanTableLoaderFactory;
+import com.think.luban.LuBanTableProperties;
+import com.think.luban.regiser.TableScanImportBeanDefinitionRegister;
 import com.think.luban.loader.ITableLoader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -19,10 +19,10 @@ import org.springframework.context.annotation.Import;
  */
 @RequiredArgsConstructor
 @AutoConfiguration
-@EnableConfigurationProperties(LubanTableProperties.class)
+@EnableConfigurationProperties(LuBanTableProperties.class)
 @Import(TableScanImportBeanDefinitionRegister.class)
 public class LubanTableAutoConfiguration {
-    private final LubanTableProperties properties;
+    private final LuBanTableProperties properties;
 
     @Bean
     public LuBanTableLoaderFactory luBanTableLoaderFactory() {
@@ -31,7 +31,7 @@ public class LubanTableAutoConfiguration {
 
     @Bean
     public Tables tables(LuBanTableLoaderFactory loaderFactory) {
-        ITableLoader<?> tableLoader = loaderFactory.getTableLoader(properties.getType());
+        ITableLoader tableLoader = loaderFactory.getTableLoader(properties.getType());
         tableLoader.setPath(properties.getPath());
         return new Tables(tableLoader);
     }

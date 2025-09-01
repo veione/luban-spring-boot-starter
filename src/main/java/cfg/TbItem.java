@@ -9,36 +9,10 @@
 
 package cfg;
 
-import com.google.gson.JsonElement;
+import com.think.luban.anno.TableRepository;
+import com.think.luban.repository.CfgRepository;
 
-
-public final class TbItem {
-    private final java.util.Map<Integer, Item> _dataMap;
-    private final java.util.List<Item> _dataList;
-
-    public TbItem(JsonElement _buf) {
-        _dataMap = new java.util.HashMap<Integer, Item>();
-        _dataList = new java.util.ArrayList<Item>();
-
-        for (JsonElement _e_ : _buf.getAsJsonArray()) {
-            Item _v;
-            _v = Item.deserialize(_e_.getAsJsonObject());
-            _dataList.add(_v);
-            _dataMap.put(_v.id, _v);
-        }
-    }
-
-    public java.util.Map<Integer, Item> getDataMap() {
-        return _dataMap;
-    }
-
-    public java.util.List<Item> getDataList() {
-        return _dataList;
-    }
-
-    public Item get(int key) {
-        return _dataMap.get(key);
-    }
-
+@TableRepository(id = "id", file = "tbitem")
+public interface TbItem extends CfgRepository<Item, Integer> {
+    
 }
-
