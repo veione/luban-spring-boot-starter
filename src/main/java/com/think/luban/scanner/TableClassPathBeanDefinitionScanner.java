@@ -2,6 +2,7 @@ package com.think.luban.scanner;
 
 import com.think.luban.TableRepositoryFactoryBean;
 import com.think.luban.anno.TableRepository;
+import org.springframework.aop.framework.autoproxy.AutoProxyUtils;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;

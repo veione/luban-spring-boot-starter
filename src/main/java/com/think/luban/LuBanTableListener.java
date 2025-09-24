@@ -1,6 +1,6 @@
 package com.think.luban;
 
-import cfg.Tables;
+import com.think.luban.manager.TableManager;
 import com.think.luban.repository.CfgRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +9,7 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -25,12 +26,14 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class LuBanTableListener implements ApplicationListener<ContextRefreshedEvent> {
     private final LuBanTableProperties properties;
-    private final Tables tables;
+    private final TableManager tableManager;
     private FileAlterationObserver fileAlterationObserver;
     private FileAlterationMonitor fileAlterationMonitor;
+    private ApplicationContext applicationContext;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        this.applicationContext = event.getApplicationContext();
         this.startMonitor();
         log.info("Luban table loaded success :)");
     }
@@ -55,18 +58,19 @@ public class LuBanTableListener implements ApplicationListener<ContextRefreshedE
                 public void onFileChange(File file) {
                     String fileName = file.getName();
                     String fileBaseName = FilenameUtils.getBaseName(fileName);
-                    Class<?> clazz = tables.getTableClass(fileBaseName);
+                    Class<?> clazz = tableManager.getTableClass(fileBaseName);
                     if (clazz == null) {
                         log.warn("Table file reload fail, table info not exist -> {}", fileBaseName);
                         return;
                     }
-                    CfgRepository<?, Serializable> repository = tables.getRepository(clazz);
+                    CfgRepository<?, Serializable> repository = tableManager.getRepository(clazz);
                     if (repository == null) {
                         log.warn("Table file reload fail, Repository not exist -> {}", fileBaseName);
                         return;
                     }
                     Reloadable reloadable = (Reloadable) repository;
                     reloadable.reload();
+                    applicationContext.publishEvent(new TableReloadEvent(applicationContext, fileName, clazz, repository));
                     log.info("Table resource {} reload success.", fileName);
                 }
             });

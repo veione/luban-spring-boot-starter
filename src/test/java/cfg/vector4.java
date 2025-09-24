@@ -10,27 +10,28 @@
 package cfg;
 
 import luban.*;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 
-public final class vector3 extends AbstractBean {
+public final class vector4 extends AbstractBean {
 	
-	public vector3(JsonObject _buf) { 
+	public vector4(JsonObject _buf) { 
         x = _buf.get("x").getAsFloat();
         y = _buf.get("y").getAsFloat();
         z = _buf.get("z").getAsFloat();
+        w = _buf.get("w").getAsFloat();
     }
 
-    public static vector3 deserialize(JsonObject _buf) {
-            return new vector3(_buf);
+    public static vector4 deserialize(JsonObject _buf) {
+            return new vector4(_buf);
     }
 
     public final float x;
     public final float y;
     public final float z;
+    public final float w;
 
-    public static final int __ID__ = 337790800;
+    public static final int __ID__ = 337790801;
     
     @Override
     public int getTypeId() { return __ID__; }
@@ -41,6 +42,7 @@ public final class vector3 extends AbstractBean {
         + "x:" + x + ","
         + "y:" + y + ","
         + "z:" + z + ","
+        + "w:" + w + ","
         + "}";
     }
 }

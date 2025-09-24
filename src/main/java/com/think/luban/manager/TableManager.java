@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-package cfg;
+package com.think.luban.manager;
 
 import com.think.luban.TableDefinition;
 import com.think.luban.loader.ITableLoader;
@@ -18,21 +18,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
-public final class Tables {
-	private final Map<Class<?>, CfgRepository<?, ?>> tableMap = new HashMap<>(64);
-    private final Map<String, Class<?>> tableNameMap = new HashMap<>(64);
+public final class TableManager {
+    private static final Map<Class<?>, CfgRepository<?, ?>> tableMap = new HashMap<>(64);
+    private static final Map<String, Class<?>> tableNameMap = new HashMap<>(64);
     private final ITableLoader loader;
 
-    public Tables(ITableLoader loader) {
+    public TableManager(ITableLoader loader) {
         this.loader = loader;
     }
 
     public <T> void register(TableDefinition definition, CfgRepository<T, Serializable> repository) {
         Class<?> clazz = definition.getClazz();
-        this.tableMap.put(clazz, repository);
-        this.tableNameMap.put(definition.getTableFileName(), clazz);
+        tableMap.put(clazz, repository);
+        tableNameMap.put(definition.getTableFileName(), clazz);
     }
 
     public ITableLoader getLoader() {
@@ -108,6 +109,94 @@ public final class Tables {
         }
 
         return repository.exists(predicate);
+    }
+
+    /**
+     * 是否包含
+     *
+     * @param clazz
+     * @param id
+     * @param <T>
+     * @param <P>
+     * @return
+     */
+    public static <T, P extends Serializable> boolean contains(Class<T> clazz, P id) {
+        CfgRepository<T, Serializable> repository = (CfgRepository<T, Serializable>) tableMap.get(clazz);
+        if (repository == null) {
+            return false;
+        }
+        return repository.exists(id);
+    }
+
+    /**
+     * 获取配置
+     *
+     * @param clazz
+     * @param id
+     * @param <T>
+     * @param <P>
+     * @return
+     */
+    public static <T, P extends Serializable> T getConfig(Class<T> clazz, P id) {
+        CfgRepository<T, Serializable> repository = (CfgRepository<T, Serializable>) tableMap.get(clazz);
+        if (repository == null) {
+            return null;
+        }
+        return repository.findById(id);
+    }
+
+    /***
+     * 获取配置
+     * @param clazz
+     * @param predicate
+     * @param <T>
+     * @return
+     */
+    public static <T> T getConfig(Class<T> clazz, Predicate<T> predicate) {
+        CfgRepository<T, Serializable> repository = (CfgRepository<T, Serializable>) tableMap.get(clazz);
+        if (repository == null) {
+            return null;
+        }
+        List<T> list = repository.findAll();
+        Optional<T> o = list.stream().filter(predicate).findFirst();
+        return o.orElse(null);
+
+    }
+
+    /**
+     * 获取配置列表
+     *
+     * @param clazz
+     */
+    public static <T> List<T> getList(Class<T> clazz) {
+        CfgRepository<T, Serializable> repository = (CfgRepository<T, Serializable>) tableMap.get(clazz);
+        if (repository == null) {
+            return null;
+        }
+        return repository.findAll();
+    }
+
+    /**
+     * 获取某个配置对象的属性
+     * <pre>
+     *     使用方法：
+     *      Integer value = ConfigManager.getInstance().getValue(BattlePigExpConfig.class, 1, BattlePigExpConfig::getLevel);
+     * </pre>
+     *
+     * @param clazz    配置class
+     * @param id       配置对象的ID
+     * @param function 对象函数
+     * @param <T>      配置对象类型
+     * @param <V>      配置对象
+     * @param <P>      配置ID
+     * @return
+     */
+    public static <T, V, P extends Serializable> T getValue(Class<V> clazz, P id, Function<V, T> function) {
+        V config = getConfig(clazz, id);
+        if (config != null) {
+            return function.apply(config);
+        }
+        return null;
     }
 }
 

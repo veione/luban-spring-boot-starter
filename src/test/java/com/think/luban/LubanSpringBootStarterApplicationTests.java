@@ -1,18 +1,18 @@
 package com.think.luban;
 
 import cfg.Item;
-import cfg.Tables;
+import com.think.luban.manager.TableManager;
 import cfg.TbItem;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.List;
 
-@SpringBootTest
+@SpringBootTest(classes = LuBanTableProperties.class)
+@EnableConfigurationProperties
 public class LubanSpringBootStarterApplicationTests {
     private LuBanTableProperties properties;
     private ApplicationContext applicationContext;
@@ -37,10 +37,10 @@ public class LubanSpringBootStarterApplicationTests {
 
         System.out.println("count: " + repository.count(p -> true));
 
-        Tables tables = applicationContext.getBean(Tables.class);
-        List<Item> all = tables.findAll(Item.class);
+        TableManager tableManager = applicationContext.getBean(TableManager.class);
+        List<Item> all = tableManager.findAll(Item.class);
         System.out.println("all: " + all);
-        Item byId = tables.findById(Item.class, 1);
+        Item byId = tableManager.findById(Item.class, 1);
         System.out.println("item: " + byId);
     }
 

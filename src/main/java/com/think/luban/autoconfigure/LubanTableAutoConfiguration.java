@@ -1,6 +1,6 @@
 package com.think.luban.autoconfigure;
 
-import cfg.Tables;
+import com.think.luban.manager.TableManager;
 import com.think.luban.loader.LuBanTableLoaderFactory;
 import com.think.luban.LuBanTableProperties;
 import com.think.luban.regiser.TableScanImportBeanDefinitionRegister;
@@ -30,9 +30,9 @@ public class LubanTableAutoConfiguration {
     }
 
     @Bean
-    public Tables tables(LuBanTableLoaderFactory loaderFactory) {
+    public TableManager tables(LuBanTableLoaderFactory loaderFactory) {
         ITableLoader tableLoader = loaderFactory.getTableLoader(properties.getType());
         tableLoader.setPath(properties.getPath());
-        return new Tables(tableLoader);
+        return new TableManager(tableLoader);
     }
 }

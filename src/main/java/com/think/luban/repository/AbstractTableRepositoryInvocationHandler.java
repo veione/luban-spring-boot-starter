@@ -1,6 +1,6 @@
 package com.think.luban.repository;
 
-import cfg.Tables;
+import com.think.luban.manager.TableManager;
 import com.think.luban.LuBanTableProperties;
 import com.think.luban.Reloadable;
 import com.think.luban.TableDefinition;
@@ -21,7 +21,7 @@ import java.util.function.Predicate;
 
 public abstract class AbstractTableRepositoryInvocationHandler<T> implements CfgRepository<T, Serializable>, InvocationHandler, Reloadable {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-    protected final Tables tables;
+    protected final TableManager tableManager;
     protected final Class<T> clazz;
     protected final Class<T> tableClazz;
     protected final Map<Serializable, T> items = new HashMap<>(64);
@@ -29,12 +29,12 @@ public abstract class AbstractTableRepositoryInvocationHandler<T> implements Cfg
     protected final LuBanTableProperties tableProperties;
 
     public AbstractTableRepositoryInvocationHandler(ApplicationContext applicationContext, Class<T> clazz) {
-        this.tables = applicationContext.getBean(Tables.class);
+        this.tableManager = applicationContext.getBean(TableManager.class);
         this.tableProperties = applicationContext.getBean(LuBanTableProperties.class);
         this.clazz = clazz;
         this.tableClazz = getCfgBeanType(clazz);
         this.definition = new TableDefinition(tableClazz, clazz);
-        this.tables.register(definition, this);
+        this.tableManager.register(definition, this);
         this.init();
     }
 

@@ -23,7 +23,7 @@ public class ByteTableRepositoryInvocationHandler<T> extends AbstractTableReposi
     public synchronized void reload() {
         // 先清理之前的资源
         items.clear();
-        ITableLoader loader = tables.getLoader();
+        ITableLoader loader = tableManager.getLoader();
         String tableFileName = definition.getTableFileName();
 
         try {
