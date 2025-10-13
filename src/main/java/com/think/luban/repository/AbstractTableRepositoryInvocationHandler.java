@@ -102,6 +102,11 @@ public abstract class AbstractTableRepositoryInvocationHandler<T> implements Cfg
     }
 
     @Override
+    public int size() {
+        return items.size();
+    }
+
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         // Object 方法，走原生方法,比如hashCode()
         if (Object.class.equals(method.getDeclaringClass())) {

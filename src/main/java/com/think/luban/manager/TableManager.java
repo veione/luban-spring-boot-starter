@@ -198,5 +198,20 @@ public final class TableManager {
         }
         return null;
     }
+
+    /**
+     * 获取配置数据数量
+     *
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    public static <T> int size(Class<T> clazz) {
+        CfgRepository<T, Serializable> repository = (CfgRepository<T, Serializable>) tableMap.get(clazz);
+        if (repository == null) {
+            return 0;
+        }
+        return repository.size();
+    }
 }
 

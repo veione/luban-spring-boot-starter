@@ -26,4 +26,6 @@ public interface CfgRepository<T, Serializable> {
     boolean exists(Serializable id);
 
     boolean exists(Predicate<T> predicate);
+
+    int size();
 }
