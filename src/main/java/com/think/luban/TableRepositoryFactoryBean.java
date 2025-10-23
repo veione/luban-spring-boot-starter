@@ -27,16 +27,24 @@ public class TableRepositoryFactoryBean<T> implements FactoryBean<T>, Applicatio
     public T getObject() throws Exception {
         // 因为DefaultCfgRepositoryInvocationHandler需要Class<T>作为参数,所以该类包含一个Class<T>的成员,通过构造函数初始化
         LuBanTableProperties props = applicationContext.getBean(LuBanTableProperties.class);
-        return switch (props.getType()) {
-            case JSON -> (T) Proxy.newProxyInstance(
-                    interfaceType.getClassLoader(),
-                    new Class[]{interfaceType},
-                    new JsonTableRepositoryInvocationHandler<>(applicationContext, interfaceType));
-            case BYTE -> (T) Proxy.newProxyInstance(
-                    interfaceType.getClassLoader(),
-                    new Class[]{interfaceType},
-                    new ByteTableRepositoryInvocationHandler<>(applicationContext, interfaceType));
-        };
+        T result;
+        switch (props.getType()) {
+            case JSON:
+                result = (T) Proxy.newProxyInstance(
+                        interfaceType.getClassLoader(),
+                        new Class[]{interfaceType},
+                        new JsonTableRepositoryInvocationHandler<>(applicationContext, interfaceType));
+                break;
+            case BYTE:
+                result = (T) Proxy.newProxyInstance(
+                        interfaceType.getClassLoader(),
+                        new Class[]{interfaceType},
+                        new ByteTableRepositoryInvocationHandler<>(applicationContext, interfaceType));
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported type: " + props.getType());
+        }
+        return result;
     }
 
     @Override

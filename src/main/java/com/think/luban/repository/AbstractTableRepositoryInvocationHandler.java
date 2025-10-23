@@ -13,11 +13,13 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public abstract class AbstractTableRepositoryInvocationHandler<T> implements CfgRepository<T, Serializable>, InvocationHandler, Reloadable {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -47,9 +49,11 @@ public abstract class AbstractTableRepositoryInvocationHandler<T> implements Cfg
     private <T> Class<T> getCfgBeanType(Class<?> clazz) {
         Type genericSuperclass = clazz.getGenericInterfaces()[0]; // Assuming the first interface is the one we want
 
-        if (!(genericSuperclass instanceof ParameterizedType parameterizedType)) {
+        if (!(genericSuperclass instanceof ParameterizedType)) {
             throw new IllegalArgumentException("Supertype is not parameterized");
         }
+
+        ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
 
         Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
 
@@ -78,12 +82,12 @@ public abstract class AbstractTableRepositoryInvocationHandler<T> implements Cfg
 
     @Override
     public List<T> findAll(Predicate<T> predicate) {
-        return items.values().stream().filter(predicate).toList();
+        return items.values().stream().filter(predicate).collect(Collectors.toList());
     }
 
     @Override
     public List<T> findAll() {
-        return items.values().stream().toList();
+        return new ArrayList<>(items.values());
     }
 
     @Override
