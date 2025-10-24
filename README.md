@@ -53,7 +53,7 @@ List<CfgItem> allConfigs = TableManager.getList(CfgItem.class);
 boolean exists = TableManager.contains(CfgItem.class, 1);
 
 // 获取配置项数量
-int count = TableManager.size(CfgItem.class);
+int count = TableManager.len(CfgItem.class);
 
 ```
 - 方式二(通过Spring注入的方式)：
@@ -88,7 +88,7 @@ public class UserService{
         boolean exists = cfgItemTable.exists(p -> p.type == 100);
 
         // 获取配置项数量
-        int len = cfgItemTable.size();
+        int len = cfgItemTable.len();
     }
 }
 

@@ -106,7 +106,7 @@ public abstract class AbstractTableRepositoryInvocationHandler<T> implements Cfg
     }
 
     @Override
-    public int size() {
+    public int len() {
         return items.size();
     }
 

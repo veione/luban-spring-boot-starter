@@ -211,7 +211,7 @@ public final class TableManager {
         if (repository == null) {
             return 0;
         }
-        return repository.size();
+        return repository.len();
     }
 }
 
