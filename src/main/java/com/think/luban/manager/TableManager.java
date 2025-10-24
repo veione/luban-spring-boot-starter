@@ -206,12 +206,12 @@ public final class TableManager {
      * @param <T>
      * @return
      */
-    public static <T> int size(Class<T> clazz) {
+    public static <T> int len(Class<T> clazz) {
         CfgRepository<T, Serializable> repository = (CfgRepository<T, Serializable>) tableMap.get(clazz);
         if (repository == null) {
             return 0;
         }
-        return repository.size();
+        return repository.len();
     }
 }
 
