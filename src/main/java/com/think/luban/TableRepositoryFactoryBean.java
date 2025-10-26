@@ -4,6 +4,7 @@ import com.think.luban.repository.ByteTableRepositoryInvocationHandler;
 import com.think.luban.repository.JsonTableRepositoryInvocationHandler;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -15,9 +16,10 @@ import java.lang.reflect.Proxy;
  * @param <T>
  * @author veione
  */
-public class TableRepositoryFactoryBean<T> implements FactoryBean<T>, ApplicationContextAware {
+public class TableRepositoryFactoryBean<T> implements FactoryBean<T>, ApplicationContextAware, SmartInitializingSingleton {
     private final Class<T> interfaceType;
     private ApplicationContext applicationContext;
+    private volatile T object;
 
     public TableRepositoryFactoryBean(Class<T> interfaceType) {
         this.interfaceType = interfaceType;
@@ -26,25 +28,31 @@ public class TableRepositoryFactoryBean<T> implements FactoryBean<T>, Applicatio
     @Override
     public T getObject() throws Exception {
         // 因为DefaultCfgRepositoryInvocationHandler需要Class<T>作为参数,所以该类包含一个Class<T>的成员,通过构造函数初始化
-        LuBanTableProperties props = applicationContext.getBean(LuBanTableProperties.class);
-        T result;
-        switch (props.getType()) {
-            case JSON:
-                result = (T) Proxy.newProxyInstance(
-                        interfaceType.getClassLoader(),
-                        new Class[]{interfaceType},
-                        new JsonTableRepositoryInvocationHandler<>(applicationContext, interfaceType));
-                break;
-            case BYTE:
-                result = (T) Proxy.newProxyInstance(
-                        interfaceType.getClassLoader(),
-                        new Class[]{interfaceType},
-                        new ByteTableRepositoryInvocationHandler<>(applicationContext, interfaceType));
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported type: " + props.getType());
+        if (object == null) {
+            synchronized (this) {
+                if (object == null) {
+                    // 原有创建逻辑
+                    LuBanTableProperties props = applicationContext.getBean(LuBanTableProperties.class);
+                    switch (props.getType()) {
+                        case JSON:
+                            object = (T) Proxy.newProxyInstance(
+                                    interfaceType.getClassLoader(),
+                                    new Class[]{interfaceType},
+                                    new JsonTableRepositoryInvocationHandler<>(applicationContext, interfaceType));
+                            break;
+                        case BYTE:
+                            object = (T) Proxy.newProxyInstance(
+                                    interfaceType.getClassLoader(),
+                                    new Class[]{interfaceType},
+                                    new ByteTableRepositoryInvocationHandler<>(applicationContext, interfaceType));
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Unsupported type: " + props.getType());
+                    }
+                }
+            }
         }
-        return result;
+        return object;
     }
 
     @Override
@@ -61,5 +69,14 @@ public class TableRepositoryFactoryBean<T> implements FactoryBean<T>, Applicatio
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void afterSingletonsInstantiated() {
+        try {
+            getObject();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to pre-initialize TableRepository", e);
+        }
     }
 }
