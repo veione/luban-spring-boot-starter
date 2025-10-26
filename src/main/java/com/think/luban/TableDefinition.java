@@ -65,7 +65,32 @@ public final class TableDefinition {
      * @throws IllegalAccessException
      */
     public <T> Serializable getIdValue(T item) throws IllegalAccessException {
-        return idField.getInt(item);
+        if (idField == null) {
+            throw new IllegalStateException("ID field not found");
+        }
+
+        Class<?> fieldType = idField.getType();
+        Object value = idField.get(item);
+
+        if (value == null) {
+            return null;
+        }
+
+        // 根据字段类型返回相应的值
+        if (fieldType == int.class || fieldType == Integer.class) {
+            return (Integer) value;
+        } else if (fieldType == long.class || fieldType == Long.class) {
+            return (Long) value;
+        } else if (fieldType == String.class) {
+            return (String) value;
+        } else if (fieldType == short.class || fieldType == Short.class) {
+            return (Short) value;
+        } else if (fieldType == byte.class || fieldType == Byte.class) {
+            return (Byte) value;
+        } else {
+            // 对于其他类型，直接返回其toString()表示
+            return (Serializable) value;
+        }
     }
 
     public Class<?> getClazz() {

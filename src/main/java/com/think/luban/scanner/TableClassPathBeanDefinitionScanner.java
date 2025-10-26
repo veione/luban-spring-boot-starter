@@ -50,7 +50,7 @@ public class TableClassPathBeanDefinitionScanner extends ClassPathBeanDefinition
             // 将beanClassName中的类名解析为Class对象
             Class<?> beanClass = Class.forName(beanClassName);
             constructorArgumentValues.addGenericArgumentValue(beanClass);
-            definition.setLazyInit(true);
+            definition.setLazyInit(false);
             // 设置工厂
             definition.setBeanClass(TableRepositoryFactoryBean.class);
             definition.setAutowireMode(GenericBeanDefinition.AUTOWIRE_BY_TYPE);
