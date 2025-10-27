@@ -14,7 +14,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -30,6 +31,7 @@ public class LuBanTableListener implements ApplicationListener<ContextRefreshedE
     private FileAlterationObserver fileAlterationObserver;
     private FileAlterationMonitor fileAlterationMonitor;
     private ApplicationContext applicationContext;
+    private final ResourceLoader resourceLoader;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -46,9 +48,18 @@ public class LuBanTableListener implements ApplicationListener<ContextRefreshedE
         long interval = TimeUnit.SECONDS.toMillis(properties.getInterval());
 
         try {
-            String path = new ClassPathResource(properties.getPath()).getFile().getAbsolutePath();
+            String path = properties.getPath();
+            String tablePath;
+
+            if (path.startsWith("file") || path.startsWith("classpath")) {
+                Resource resource = resourceLoader.getResource(path);
+                tablePath = resource.getFile().getPath();
+            } else {
+                tablePath = path;
+            }
+
             // 创建一个文件观察器用于处理文件的格式
-            fileAlterationObserver = new FileAlterationObserver(path,
+            fileAlterationObserver = new FileAlterationObserver(tablePath,
                     FileFilterUtils.and(FileFilterUtils.fileFileFilter())
                             .or(FileFilterUtils.suffixFileFilter("json"))
                             .or(FileFilterUtils.suffixFileFilter("bytes")));
@@ -63,7 +74,7 @@ public class LuBanTableListener implements ApplicationListener<ContextRefreshedE
                         log.warn("Table file reload fail, table info not exist -> {}", fileBaseName);
                         return;
                     }
-                    CfgRepository<?, Serializable> repository = tableManager.getRepository(clazz);
+                    CfgRepository<?, Serializable> repository = TableManager.getRepository(clazz);
                     if (repository == null) {
                         log.warn("Table file reload fail, Repository not exist -> {}", fileBaseName);
                         return;
@@ -76,7 +87,7 @@ public class LuBanTableListener implements ApplicationListener<ContextRefreshedE
             });
             fileAlterationMonitor = new FileAlterationMonitor(interval, fileAlterationObserver);
             fileAlterationMonitor.start();
-            log.info("Table hotswap monitor stared :) interval(s): {}, path: {}", interval, path);
+            log.info("Table hotswap monitor stared :) interval(s): {}, path: {}", interval, tablePath);
         } catch (Exception e) {
             log.error("Start table hotswap monitor failed", e);
         }
