@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import luban.ByteBuf;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -24,7 +25,7 @@ public class ByteTableLoader extends AbstractTableLoader {
     @Override
     public ByteBuf load(String file) throws IOException {
         String fileName = String.format("%s%s%s.bytes", path, File.separator, file);
-        ClassPathResource resource = new ClassPathResource(fileName);
+        Resource resource = resourceLoader.getResource(fileName);
         if (resource.exists()) {
             try (InputStream inputStream = resource.getInputStream()) {
                 byte[] data = IOUtils.toByteArray(inputStream);

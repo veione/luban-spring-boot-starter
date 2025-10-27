@@ -6,6 +6,7 @@ import com.think.luban.LuBanTableProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -26,7 +27,7 @@ public class JsonTableLoader extends AbstractTableLoader {
     @Override
     public JsonElement load(String file) throws IOException {
         String fileName = String.format("%s%s%s.json", path, File.separator, file);
-        ClassPathResource resource = new ClassPathResource(fileName);
+        Resource resource = resourceLoader.getResource(fileName);
         if (resource.exists()) {
             try (InputStream inputStream = resource.getInputStream()) {
                 String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
