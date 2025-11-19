@@ -17,15 +17,15 @@ public interface CfgRepository<T, Serializable> {
 
     Optional<T> findById(Predicate<T> predicate);
 
-    List<T> findAll(Predicate<T> predicate);
+    List<T> getList(Predicate<T> predicate);
 
-    List<T> findAll();
+    List<T> getList();
 
     long count(Predicate<T> predicate);
 
-    boolean exists(Serializable id);
+    boolean contains(Serializable id);
 
-    boolean exists(Predicate<T> predicate);
+    boolean contains(Predicate<T> predicate);
 
     int len();
 }

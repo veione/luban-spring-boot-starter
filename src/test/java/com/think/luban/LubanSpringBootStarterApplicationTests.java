@@ -30,7 +30,7 @@ public class LubanSpringBootStarterApplicationTests {
     @Test
     public void test() {
         TbItem repository = applicationContext.getBean(TbItem.class);
-        List<Item> all1 = repository.findAll();
+        List<Item> all1 = repository.getList();
         System.out.println("all1 = " + all1);
         Item item = repository.findById(3008);
         System.out.println("item: " + item);

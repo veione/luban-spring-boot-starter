@@ -63,7 +63,7 @@ public final class TableManager {
             return null;
         }
 
-        return repository.findAll(predicate);
+        return repository.getList(predicate);
     }
 
     public <T> List<T> findAll(Class<T> clazz) {
@@ -72,7 +72,7 @@ public final class TableManager {
             return null;
         }
 
-        return repository.findAll();
+        return repository.getList();
     }
 
     public <T> long count(Class<T> clazz, Predicate<T> predicate) {
@@ -90,7 +90,7 @@ public final class TableManager {
             return false;
         }
 
-        return repository.exists(id);
+        return repository.contains(id);
     }
 
     public <T> boolean exists(Class<T> clazz, Predicate<T> predicate) {
@@ -99,7 +99,7 @@ public final class TableManager {
             return false;
         }
 
-        return repository.exists(predicate);
+        return repository.contains(predicate);
     }
 
     /**
@@ -116,7 +116,7 @@ public final class TableManager {
         if (repository == null) {
             return false;
         }
-        return repository.exists(id);
+        return repository.contains(id);
     }
 
     /**
@@ -148,7 +148,7 @@ public final class TableManager {
         if (repository == null) {
             return null;
         }
-        List<T> list = repository.findAll();
+        List<T> list = repository.getList();
         Optional<T> o = list.stream().filter(predicate).findFirst();
         return o.orElse(null);
 
@@ -164,7 +164,7 @@ public final class TableManager {
         if (repository == null) {
             return null;
         }
-        return repository.findAll();
+        return repository.getList();
     }
 
     /**

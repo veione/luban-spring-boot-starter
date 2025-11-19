@@ -77,12 +77,12 @@ public abstract class AbstractTableRepositoryInvocationHandler<T> implements Cfg
     }
 
     @Override
-    public List<T> findAll(Predicate<T> predicate) {
+    public List<T> getList(Predicate<T> predicate) {
         return items.values().stream().filter(predicate).toList();
     }
 
     @Override
-    public List<T> findAll() {
+    public List<T> getList() {
         return items.values().stream().toList();
     }
 
@@ -92,12 +92,12 @@ public abstract class AbstractTableRepositoryInvocationHandler<T> implements Cfg
     }
 
     @Override
-    public boolean exists(Serializable id) {
+    public boolean contains(Serializable id) {
         return items.containsKey(id);
     }
 
     @Override
-    public boolean exists(Predicate<T> predicate) {
+    public boolean contains(Predicate<T> predicate) {
         return items.values().stream().anyMatch(predicate);
     }
 
