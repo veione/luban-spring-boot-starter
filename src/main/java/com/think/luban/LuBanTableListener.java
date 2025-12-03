@@ -49,6 +49,9 @@ public class LuBanTableListener implements ApplicationListener<ContextRefreshedE
 
         try {
             String path = properties.getPath();
+            if (path == null || path.isEmpty()) {
+                return;
+            }
             String tablePath;
 
             if (path.startsWith("file") || path.startsWith("classpath")) {

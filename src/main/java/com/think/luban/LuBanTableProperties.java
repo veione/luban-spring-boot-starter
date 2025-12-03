@@ -18,7 +18,7 @@ public class LuBanTableProperties {
     /**
      * 加载路径
      */
-    private String path;
+    private String path = "";
     /**
      * 配置表检查间隔时间(s)
      */
